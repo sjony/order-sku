@@ -12,7 +12,6 @@ public class BaseController {
     public String success(Object data) {
         Result result = new Result();
         result.setData(data);
-        System.out.print("111");
         result.setSno(ServiceNumberSupport.getServceNum());
         result.setSuccess("1");
         SerializeWriter sw = new SerializeWriter();
