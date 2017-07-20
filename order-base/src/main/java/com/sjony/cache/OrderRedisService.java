@@ -34,7 +34,7 @@ public class OrderRedisService implements  ICache{
     public <T> T get(String key, Class<T> type) {
         T value = null;
         try {
-            value = redisClient.get(key);
+            value = redisClient.getValue(key);
             if (logger.isDebugEnabled()) {
                 logger.debug("get cache: key is " + key + ", value is " + value);
             }
@@ -52,7 +52,7 @@ public class OrderRedisService implements  ICache{
         try {
             T value = null;
             for(String key : keyList) {
-                value = redisClient.get(key);
+                value = redisClient.getValue(key);
                 if (logger.isDebugEnabled()) {
                     logger.debug("get cache: key is " + key + ", value is " + value);
                 }
@@ -77,7 +77,7 @@ public class OrderRedisService implements  ICache{
     @Override
     public void put(String key, Object value) {
         try {
-            redisClient.put(key, value);
+            redisClient.putValue(key, value);
             keySet.add(key);
             if (logger.isDebugEnabled()) {
                 logger.debug("put cache: key is " + key + ", value is " + value);
