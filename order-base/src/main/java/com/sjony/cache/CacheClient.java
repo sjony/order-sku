@@ -2,6 +2,7 @@ package com.sjony.cache;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by sjony on 2017/7/18.
@@ -20,6 +21,12 @@ public interface CacheClient {
     void pushRight(String key, Object value);
     <T>T popLeft(String key);
     <T>T popRight(String key);
+    <T>Set<T> getSet(String key);
+    <T>Set<T> intersect(String key, String key1);
+    void addZSet(String key, Object value, Double score);
+    void addScore(String key, Object value, Double score);
+    <T>Set<T> range(String key, Long start, Long end);
+    <T>Set<T> reverseRange(String key, Long start, Long end);
 
 
 }

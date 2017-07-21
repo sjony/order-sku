@@ -4,6 +4,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @Description: redis客户端
@@ -178,6 +179,95 @@ public class RedisClient implements CacheClient {
     public <T> T popRight(String key) {
 
         return (T) redisTemplate.opsForList().rightPop(key);
+    }
+
+    /**
+     * @Description:获取数据(set)
+     * @Create on: 2017/7/21 下午2:00
+     * @author jshu
+     *
+     * @param key
+     *
+     */
+    @Override
+    public <T> Set<T> getSet(String key) {
+
+        return redisTemplate.opsForSet().members(key);
+    }
+
+    /**
+     * @Description:取交集(set)
+     * @Create on: 2017/7/21 下午2:02
+     * @author jshu
+     *
+     * @param key
+     * @param key1
+     *
+     */
+    @Override
+    public <T> Set<T> intersect(String key, String key1) {
+        return redisTemplate.opsForSet().intersect(key, key1);
+    }
+
+    /**
+     * @Description:新增值（有序集合，根据score）
+     * @Create on: 2017/7/21 下午2:10
+     * @author jshu
+     *
+     * @param key
+     * @param value
+     * @param score
+     *
+     */
+    @Override
+    public void addZSet(String key, Object value, Double score) {
+        redisTemplate.opsForZSet().add(key, value, score);
+    }
+
+    /**
+     * @Description:新增比较数
+     * @Create on: 2017/7/21 下午2:14
+     * @author jshu
+     *
+     * @param key
+     * @param value
+     * @param score
+     *
+     */
+    @Override
+    public void addScore(String key, Object value, Double score) {
+        redisTemplate.opsForZSet().incrementScore(key, value, score);
+    }
+
+    /**
+     * @Description:获取一定的范围的值(正序)
+     * @Create on: 2017/7/21 下午2:16
+     * @author jshu
+     *
+     * @param key
+     * @param start
+     * @param end
+     *
+     */
+    @Override
+    public <T> Set<T> range(String key, Long start, Long end) {
+
+        return redisTemplate.opsForZSet().range(key, start, end);
+    }
+
+    /**
+     * @Description:获取一定的范围的值(逆序)
+     * @Create on: 2017/7/21 下午2:16
+     * @author jshu
+     *
+     * @param key
+     * @param start
+     * @param end
+     *
+     */
+    @Override
+    public <T> Set<T> reverseRange(String key, Long start, Long end) {
+        return redisTemplate.opsForZSet().reverseRange(key, start, end);
     }
 
 
