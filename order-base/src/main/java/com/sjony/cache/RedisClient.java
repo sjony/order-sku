@@ -1,8 +1,8 @@
 package com.sjony.cache;
 
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.jca.cci.core.support.CciDaoSupport;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -80,14 +80,104 @@ public class RedisClient implements CacheClient {
         return redisTemplate.opsForHash().entries(key);
     }
 
+    /**
+     * @Description:存入所有map
+     * @Create on: 2017/7/21 上午10:24
+     * @author jshu
+     *
+     * @param key
+     * @param value
+     *
+     */
     @Override
     public void putMap(String key, Map value) {
+
         redisTemplate.opsForHash().putAll(key, value);
     }
 
+    /**
+     * @Description:针对性的存入map
+     * @Create on: 2017/7/21 上午10:24
+     * @author jshu
+     *
+     * @param key
+     * @param hk
+     * @param value
+     *
+     */
     @Override
     public void putMapValue(String key, Object hk, Object value) {
         redisTemplate.opsForHash().put( key, hk, value);
+    }
+
+    /**
+     * @Description:获取list
+     * @Create on: 2017/7/21 上午10:40
+     * @author jshu
+     *
+     * @param key
+     *
+     */
+    @Override
+    public <T> List<T> getList(String key) {
+        return redisTemplate.opsForList().range(key, 0, redisTemplate.opsForList().size(key));
+    }
+
+    /**
+     * @Description:左插入（list)
+     * @Create on: 2017/7/21 下午1:27
+     * @author jshu
+     *
+     * @param key
+     * @param value
+     *
+     */
+    @Override
+    public void pushLeft(String key, Object value) {
+        redisTemplate.opsForList().leftPush(key, value);
+    }
+
+    /**
+     * @Description:右插入（list)
+     * @Create on: 2017/7/21 下午1:31
+     * @author jshu
+     *
+     * @param key
+     * @param value
+     *
+     */
+    @Override
+    public void pushRight(String key, Object value) {
+
+        redisTemplate.opsForList().rightPush(key, value);
+    }
+
+    /**
+     * @Description:左抛出（List)
+     * @Create on: 2017/7/21 下午1:31
+     * @author jshu
+     *
+     * @param key
+     *
+     */
+    @Override
+    public <T> T popLeft(String key) {
+
+        return (T) redisTemplate.opsForList().leftPop(key);
+    }
+
+    /**
+     * @Description:右抛出
+     * @Create on: 2017/7/21 下午1:32
+     * @author jshu
+     *
+     * @param key
+     *
+     */
+    @Override
+    public <T> T popRight(String key) {
+
+        return (T) redisTemplate.opsForList().rightPop(key);
     }
 
 

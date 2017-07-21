@@ -1,5 +1,6 @@
 package com.sjony.cache;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,5 +15,11 @@ public interface CacheClient {
     <K,V>Map<K,V> getMap(String key);
     void putMap(String key, Map value);
     void putMapValue(String key, Object hk, Object value);
+    <T>List<T> getList(String key);
+    void pushLeft(String key, Object value);
+    void pushRight(String key, Object value);
+    <T>T popLeft(String key);
+    <T>T popRight(String key);
+
 
 }
