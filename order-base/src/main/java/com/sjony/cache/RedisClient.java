@@ -177,7 +177,6 @@ public class RedisClient implements CacheClient {
      */
     @Override
     public <T> T popRight(String key) {
-
         return (T) redisTemplate.opsForList().rightPop(key);
     }
 
@@ -191,8 +190,18 @@ public class RedisClient implements CacheClient {
      */
     @Override
     public <T> Set<T> getSet(String key) {
-
         return redisTemplate.opsForSet().members(key);
+    }
+
+    /**
+     * @Description: 新增set
+     * @Create on: 2017/7/22 下午3:06
+     *
+     * @author shujiangcheng
+     */
+    @Override
+    public void addSet(String key, Object... value) {
+
     }
 
     /**

@@ -9,4 +9,8 @@ public class SalesTask {
 
     }
 
+    public void saleRank() {
+
+    }
+
 }

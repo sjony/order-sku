@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.sjony.dao.OrderSkuDao">
+
+    <resultMap  type="com.sjony.entity.OrderSkuEntity" id="orderSkuEntity">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="sku_code" property="skuCode" jdbcType="VARCHAR"/>
+        <result column="sku_qty" property="skuQty" jdbcType="NUMERIC"/>
+        <result column="order_code" property="orderCode" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="create_user" property="createUser" jdbcType="VARCHAR"/>
+        <result column="update_user" property="updateUser" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <insert id="insertOrderSku" parameterType="com.sjony.entity.OrderSkuEntity">
+        INSERT INTO t_order_goods(
+            order_code,sku_code,
+        sku_qty,create_time,update_time,create_user,update_user
+        ) VALUES (
+        #{entity.orderCode},  #{entity.skuCode},
+        #{entity.skuQty},#{entity.createTime},#{entity.updateTime},#{entity.createUser},#{entity.updateUser}
+        )
+    </insert>
+
+    <update id="updateOrderSku" parameterType="java.util.List">
+        <foreach collection="orderSkuList" item="item" index="index" open="" close="" separator=";">
+            UPDATE t_order_goods SET
+            <trim suffix="" suffixOverrides=",">
+                <if test="item.skuCode != null">
+                    sku_code = #{item.skuCode},
+                </if>
+                <if test="item.skuQty != null">
+                    sku_qty = #{item.skuQty},
+                </if>
+                <if test="item.orderCode != null">
+                    order_code = #{item.orderCode},
+                </if>
+                <if test="item.createTime != null">
+                    create_time = #{item.createTime},
+                </if>
+                <if test="item.updateTime != null">
+                    update_time = #{item.updateTime},
+                </if>
+                <if test="item.createUser != null">
+                    create_user = #{item.createUser},
+                </if>
+                <if test="item.updateUser != null">
+                    update_user = #{item.updateUser},
+                </if>
+            </trim>
+            <trim prefix="WHERE" prefixOverrides="AND |OR ">
+                <if test="item.id != null">
+                    id = #{item.id}
+                </if>
+                <if test="item.orderCode != null">
+                   AND order_code = #{item.orderCode},
+                </if>
+            </trim>
+        </foreach>
+    </update>
+
+
+    <select id="selectOrderSkuBySkuCode" parameterType="java.util.List"  resultType="java.util.List" resultMap="orderSkuEntity" >
+        SELECT id,order_code,sku_code,sku_qty,create_time,update_time,create_user,update_user
+        FROM t_order_goods
+        WHERE sku_code IN
+        <foreach collection="skuList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectOrderQtyByOrderCode" parameterType="java.util.List"  resultType="java.util.List" resultMap="orderSkuEntity" >
+        SELECT id,order_code,sku_code,sku_qty,create_time,update_time,create_user,update_user
+        FROM t_order_goods
+        WHERE order_code IN
+        <foreach collection="orderList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

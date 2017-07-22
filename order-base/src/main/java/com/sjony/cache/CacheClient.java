@@ -22,6 +22,7 @@ public interface CacheClient {
     <T>T popLeft(String key);
     <T>T popRight(String key);
     <T>Set<T> getSet(String key);
+    void addSet(String key, Object... value);
     <T>Set<T> intersect(String key, String key1);
     void addZSet(String key, Object value, Double score);
     void addScore(String key, Object value, Double score);
