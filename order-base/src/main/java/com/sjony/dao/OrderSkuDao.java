@@ -18,7 +18,11 @@ public interface OrderSkuDao {
 
     int insertOrderSku(@Param("entity") OrderSkuEntity orderSkuEntity);
 
+    int updateOrderSku(@Param("orderSkuList")List<OrderSkuEntity> skuQtyList);
 
-    List<SkuQtyEntity> selectSkuQtyBySkuCode(@Param("skuList") List<String> skuList);
+    List<OrderSkuEntity> selectOrderSkuBySkuCode(@Param("skuList") List<String> skuList);
+
+    List<OrderSkuEntity> selectOrderQtyByOrderCode(@Param("orderList") List<String> orderList);
+
 
 }

@@ -30,7 +30,7 @@
     </insert>
 
     <update id="updateSkuQty" parameterType="java.util.List">
-        <foreach collection="skuQtyList" item="item" index="index" open="" close="" separator=";">
+        <foreach collection="orderUserList" item="item" index="index" open="" close="" separator=";">
         UPDATE t_order_user SET
         <trim suffix="" suffixOverrides=",">
         <if test="item.orderCode != null">

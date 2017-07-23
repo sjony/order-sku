@@ -8,6 +8,7 @@ import java.util.Date;
  */
 public class OrderSkuVO implements Serializable {
 
+    private static final long serialVersionUID = 3056564445791597393L;
     private Long id;
     private String orderCode;
     private String skuCode;

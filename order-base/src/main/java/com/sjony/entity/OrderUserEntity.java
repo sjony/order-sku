@@ -8,6 +8,7 @@ import java.util.Date;
  */
 public class OrderUserEntity implements Serializable {
 
+    private static final long serialVersionUID = -250783939527648267L;
     private Long id;
     private String orderCode;
     private String status;

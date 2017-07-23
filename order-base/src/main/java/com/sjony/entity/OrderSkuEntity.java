@@ -9,6 +9,7 @@ import java.util.Date;
  */
 public class OrderSkuEntity implements Serializable {
 
+    private static final long serialVersionUID = -2426293624018905886L;
     private Long id;
     private String orderCode;
     private String skuCode;

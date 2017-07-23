@@ -12,6 +12,7 @@ import java.util.Date;
  */
 public class SkuSaleQtyEntity  implements Serializable{
 
+    private static final long serialVersionUID = 7757993026113924050L;
     private Long id;
     private String skuCode;
     private BigDecimal saleQty;

@@ -12,6 +12,7 @@ import java.util.Date;
  */
 public class SkuSaleQtyVO implements Serializable{
 
+    private static final long serialVersionUID = -8423219311766273903L;
     private Long id;
     private String skuCode;
     private BigDecimal saleQty;

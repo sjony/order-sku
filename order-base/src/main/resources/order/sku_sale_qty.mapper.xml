@@ -25,8 +25,8 @@
       )
     </insert>
 
-    <update id="updateSkuQty" parameterType="java.util.List">
-        <foreach collection="skuQtyList" item="item" index="index" open="" close="" separator=";">
+    <update id="updateSkuSaleQty" parameterType="java.util.List">
+        <foreach collection="skuSaleQtyList" item="item" index="index" open="" close="" separator=";">
         UPDATE t_sku_sale_qty SET
         <trim suffix="" suffixOverrides=",">
         <if test="item.skuCode != null">

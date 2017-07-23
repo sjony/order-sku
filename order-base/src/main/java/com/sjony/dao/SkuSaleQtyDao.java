@@ -1,6 +1,7 @@
 package com.sjony.dao;
 
 import com.sjony.entity.SkuQtyEntity;
+import com.sjony.entity.SkuSaleQtyEntity;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -15,14 +16,10 @@ import java.util.List;
 @Repository
 public interface SkuSaleQtyDao {
 
-    int insertSkuQty(@Param("entity") SkuQtyEntity skuQtyEntity);
+    int insertSkuSaleQty(@Param("entity") SkuSaleQtyEntity skuQtyEntity);
 
-    int updateSkuQty(@Param("skuQtyList") List<SkuQtyEntity> skuQtyList);
+    int updateSkuSaleQty(@Param("skuSaleQtyList") List<SkuSaleQtyEntity> skuSaleQtyList);
 
-    int updateQtyForSale(@Param("skuCode") String skuCode);
-
-    int updateQty(@Param("list") List<SkuQtyEntity> skuQtyList);
-
-    List<SkuQtyEntity> selectSkuQtyBySkuCode(@Param("skuList") List<String> skuList);
+    List<SkuSaleQtyEntity> selectSkuQtyBySkuCode(@Param("skuList") List<String> skuList);
 
 }

@@ -1,5 +1,6 @@
 package com.sjony.dao;
 
+import com.sjony.entity.OrderUserEntity;
 import com.sjony.entity.SkuQtyEntity;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -15,14 +16,10 @@ import java.util.List;
 @Repository
 public interface OrderUserDao {
 
-    int insertSkuQty(@Param("entity") SkuQtyEntity skuQtyEntity);
+    int insertOrderUser(@Param("entity") OrderUserEntity skuQtyEntity);
 
-    int updateSkuQty(@Param("skuQtyList") List<SkuQtyEntity> skuQtyList);
+    int updateSkuQty(@Param("orderUserList") List<OrderUserEntity> skuQtyList);
 
-    int updateQtyForSale(@Param("skuCode") String skuCode);
-
-    int updateQty(@Param("list") List<SkuQtyEntity> skuQtyList);
-
-    List<SkuQtyEntity> selectSkuQtyBySkuCode(@Param("skuList") List<String> skuList);
+    List<OrderUserEntity> selectOrderUserByOrderCode(@Param("orderList") List<String> orderList);
 
 }
