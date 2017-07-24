@@ -22,4 +22,6 @@ public interface SkuSaleQtyDao {
 
     List<SkuSaleQtyEntity> selectSkuQtyBySkuCode(@Param("skuList") List<String> skuList);
 
+    List<SkuSaleQtyEntity> selectSkuQtyForRank();
+
 }

@@ -8,6 +8,7 @@ import com.sjony.service.OrderSkuQtyService;
 import com.sjony.service.SkuQtyService;
 import com.sjony.utils.CollectionUtils;
 import com.sjony.vo.SkuQtyVO;
+import com.sjony.vo.SkuSaleQtyVO;
 import jdk.nashorn.internal.ir.ReturnNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
@@ -24,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -52,7 +54,7 @@ public class OrderSkuQtyController extends BaseController {
 
 
     /**
-     * @Description: 插入库存信息
+     * @Description: 获取库存信息
      * @Create on: 2017/7/15 下午2:38
      *
      * @author shujiangcheng
@@ -79,10 +81,27 @@ public class OrderSkuQtyController extends BaseController {
         /*-----------------------------------------------------------------*
                                 逻辑处理
         *----------------------------------------------------------------*/
-        List<SkuQtyVO> SkuQtyList = orderSkuQtyService.getSkuQtyBySkuCode(skuCodeList);
+        List<SkuQtyVO> skuQtyList = orderSkuQtyService.getSkuQtyBySkuCode(skuCodeList);
 
-        return success(SkuQtyList);
+        return success(skuQtyList);
     }
 
+    /**
+     * @Description: 获取销售排行 
+     * @Create on: 2017/7/24 下午1:39 
+     *
+     * @author shujiangcheng
+     */
+    @ResponseBody
+    @RequestMapping(value = "/getSkuQtyForRank", produces = "application/json;charset=UTF-8", method = RequestMethod.POST)
+    public String getSkuQtyForRank() {
+
+        /*-----------------------------------------------------------------*
+                                逻辑处理
+        *----------------------------------------------------------------*/
+        Set<SkuSaleQtyVO> skuSaleQtyList = orderSkuQtyService.getSkuQtyForRank();
+
+        return success(skuSaleQtyList);
+    }
 
 }

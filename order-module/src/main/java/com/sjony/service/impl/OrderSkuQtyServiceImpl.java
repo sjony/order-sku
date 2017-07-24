@@ -3,8 +3,10 @@ package com.sjony.service.impl;
 import com.google.common.collect.Lists;
 import com.sjony.service.OrderSkuQtyService;
 import com.sjony.service.SkuQtyService;
+import com.sjony.service.SkuSaleQtyService;
 import com.sjony.utils.CollectionUtils;
 import com.sjony.vo.SkuQtyVO;
+import com.sjony.vo.SkuSaleQtyVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +15,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,6 +30,10 @@ public class OrderSkuQtyServiceImpl implements OrderSkuQtyService {
 
     @Autowired
     private SkuQtyService skuQtyService;
+
+    @Autowired
+    private SkuSaleQtyService skuSaleQtyService;
+    
 
     /**
      * @Description: 插入商品数据
@@ -85,5 +92,11 @@ public class OrderSkuQtyServiceImpl implements OrderSkuQtyService {
         result = skuQtyService.getSkuQtyListBySkuList(skuCodeList);
 
         return result;
+    }
+
+    @Override
+    public Set<SkuSaleQtyVO> getSkuQtyForRank() {
+        Set<SkuSaleQtyVO> resultList = skuSaleQtyService.getSkuQtyForRank();
+        return resultList;
     }
 }

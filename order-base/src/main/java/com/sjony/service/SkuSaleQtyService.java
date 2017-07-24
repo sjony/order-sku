@@ -7,17 +7,13 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @Description: 库存相关
- * @Create on: 2017/7/15 下午3:06 
+ * @Description: 销售额相关接口
+ * @Create on: 2017/7/24 下午1:45 
  *
  * @author shujiangcheng
  */
-public interface OrderSkuQtyService {
-
-    void testInsert();
-
-
-    List<SkuQtyVO> getSkuQtyBySkuCode(List<String> skuCodeList);
+public interface SkuSaleQtyService {
 
     Set<SkuSaleQtyVO> getSkuQtyForRank();
+
 }

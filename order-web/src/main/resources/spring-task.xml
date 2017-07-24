@@ -18,9 +18,14 @@
 
     <task:scheduled-tasks>
         <!--
-            这里表示的是每隔五秒执行一次
+            这里表示的是每天1点执行一次
         -->
-        <task:scheduled ref="SalesTask" method="salesTask" cron="*/5 * * * * ?" />
+        <task:scheduled ref="SalesTask" method="saleRankTask" cron="0 0 1 * * ?" />
+        <!--<task:scheduled ref="SalesTask" method="saleRankTask" cron="*/60 * * * * ?" />-->
+
+        <!--//@Scheduled(cron = "0 0 1 * * ?")//每天凌晨1点整
+        //@Scheduled(cron = "0 30 0 * * ?")//每天凌晨0点30分
+        //@Scheduled(cron = "0 */60 * * * ?")//1小时处理一次-->
     </task:scheduled-tasks>
 
     <!-- 自动扫描的包名 -->

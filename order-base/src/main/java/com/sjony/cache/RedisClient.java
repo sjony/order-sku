@@ -1,7 +1,9 @@
 package com.sjony.cache;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,9 +30,19 @@ public class RedisClient implements CacheClient {
      *  @param
      */
     @Override
-    public <T> T getValue(String key) {
+    public <T> List<T> getValue(Collection<?> keys) {
+        return  redisTemplate.opsForValue().multiGet(keys);
+    }
 
-        return (T) redisTemplate.boundValueOps(key).get();
+    /**
+     * @Description: 插入一般的value，批量 
+     * @Create on: 2017/7/24 下午2:07
+     *
+     * @author shujiangcheng
+     */
+    @Override
+    public void putBatch(Map map) {
+        redisTemplate.opsForValue().multiSet(map);
     }
 
     /**
@@ -233,6 +245,10 @@ public class RedisClient implements CacheClient {
         redisTemplate.opsForZSet().add(key, value, score);
     }
 
+    public <T>void addZSet(String key, Set<ZSetOperations.TypedTuple<T>> set, Class<T> type) {
+        redisTemplate.opsForZSet().add(key, set);
+    }
+
     /**
      * @Description:新增比较数
      * @Create on: 2017/7/21 下午2:14
@@ -261,7 +277,7 @@ public class RedisClient implements CacheClient {
     @Override
     public <T> Set<T> range(String key, Long start, Long end) {
 
-        return redisTemplate.opsForZSet().range(key, start, end);
+        return redisTemplate.opsForZSet().reverseRange(key, start, end);
     }
 
     /**
@@ -279,5 +295,17 @@ public class RedisClient implements CacheClient {
         return redisTemplate.opsForZSet().reverseRange(key, start, end);
     }
 
+    /*obj = redisTemplate.execute(new RedisCallback<Object>() {
+        @Override
+        public Object doInRedis(RedisConnection connection) throws DataAccessException {
+            StringRedisSerializer serializer = new StringRedisSerializer();
+            byte[] data = connection.get(serializer.serialize(key));
+            connection.close();
+            if (data == null) {
+                return null;
+            }
+            return serializer.deserialize(data);
+        }
+    });*/
 
 }

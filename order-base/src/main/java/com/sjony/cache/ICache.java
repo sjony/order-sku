@@ -1,15 +1,21 @@
 package com.sjony.cache;
 
 
+import com.sjony.vo.SkuQtyVO;
+import com.sjony.vo.SkuSaleQtyVO;
+import org.springframework.data.redis.core.ZSetOperations;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public interface ICache {
 
-    <T> T get(String key, Class<T> type);
+    <T> T getValue(String key, Class<T> type);
 
-    void put(String key, Object value);
+    void putValue(String key, Object value);
+
+    void putValueBatch(Map<String,Object> map);
 
     void clearKey();
 
@@ -19,9 +25,7 @@ public interface ICache {
 
     void delete(String key);
 
-    <T> List<T> getBatch(List<String> key, Class<T> type);
-
-    List<String> getNeedList();
+    <T> List<T> getValueBatch(List<String> key, Class<T> type);
 
     void putMap(String key, Map value);
 
@@ -35,6 +39,6 @@ public interface ICache {
 
     <T>Set<T> range(String key, Long start, Long end, Class<T> type);
 
-
+    <T>void addZSet(String key, Set<ZSetOperations.TypedTuple<T>> set, Class<T> type);
 
 }

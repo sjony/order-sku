@@ -1,11 +1,13 @@
 package com.sjony.cache;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.sjony.utils.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,9 +22,8 @@ import java.util.Set;
  */
 public class OrderRedisService implements  ICache{
 
-    private ThreadLocal<List<String>> threadLocal = new ThreadLocal<List<String>>();
 
-    private RedisClient redisClient;
+    private CacheClient redisClient;
 
     private static Set<String> keySet = Sets.newHashSet();
     private static Set<String> mapkeySet = Sets.newHashSet();
@@ -32,15 +33,17 @@ public class OrderRedisService implements  ICache{
     private static Logger logger = LoggerFactory
             .getLogger(OrderRedisService.class);
 
-    public OrderRedisService(RedisClient redisClient) {
+    public OrderRedisService(CacheClient redisClient) {
         this.redisClient = redisClient;
     }
 
     @Override
-    public <T> T get(String key, Class<T> type) {
+    public <T> T getValue(String key, Class<T> type) {
         T value = null;
+        List<String> keyList = Lists.newArrayList(key);
         try {
-            value = redisClient.getValue(key);
+            List<T> valueList = redisClient.getValue(keyList);
+            value =  valueList.get(0);
             if (logger.isDebugEnabled()) {
                 logger.debug("get cache: key is " + key + ", value is " + value);
             }
@@ -50,24 +53,38 @@ public class OrderRedisService implements  ICache{
 
         return value;
     }
+    
+    /**
+     * @Description: 批量存入值
+     * @Create on: 2017/7/24 下午2:09 
+     *
+     * @author shujiangcheng
+     */
+    @Override
+    public void putValueBatch(Map<String,Object> map) {
+        try {
+            redisClient.putBatch(map);
+            for(String key : map.keySet()) {
+                keySet.add(key);
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("put cache: key is " + map.keySet() + ", value is " + map.values());
+            }
+        } catch (Exception e2) {
+            logger.error("存放缓存出错");
+        }
+    }
 
     @Override
-    public <T> List<T> getBatch(List<String> keyList, Class<T> type) {
+    public <T> List<T> getValueBatch(List<String> keyList, Class<T> type) {
         List<T> result = Lists.newArrayList();
-        List<String> needKeyList = Lists.newArrayList(keyList);
         try {
             T value = null;
-            for(String key : keyList) {
-                value = redisClient.getValue(key);
+            result = redisClient.getValue(keyList);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("get cache: key is " + key + ", value is " + value);
-                }
-                if(null != value) {
-                    needKeyList.remove(key);
-                    result.add(value);
-                }
+                    logger.debug("get cache: key is " + JSON.toJSONString(keyList) + ", value is " + value);
             }
-            threadLocal.set(needKeyList);
+
         } catch (Exception e2) {
             logger.error("获取缓存出错", e2);
         }
@@ -75,10 +92,6 @@ public class OrderRedisService implements  ICache{
         return result;
     }
 
-    @Override
-    public List<String> getNeedList() {
-        return threadLocal.get();
-    }
 
     /**
      * @Description: 存放修改部分值的对象
@@ -141,6 +154,25 @@ public class OrderRedisService implements  ICache{
                 logger.debug("put cache: key is " + key + ", value is " + value);
             }
         } catch (Exception e2) {
+            logger.error("存放缓存出错");
+        }
+    }
+
+    /**
+     * @Description:  新增value(ZSet),批量
+     * @Create on: 2017/7/24 下午2:44 
+     *
+     * @author shujiangcheng
+     */
+    public <T>void addZSet(String key, Set<ZSetOperations.TypedTuple<T>> set, Class<T> type) {
+        try {
+            redisClient.addZSet(key, set, type);
+            setkeySet.add(key);
+            if (logger.isDebugEnabled()) {
+                logger.debug("put cache: key is " + key + ", value is " + set);
+            }
+        } catch (Exception e2) {
+            e2.printStackTrace();
             logger.error("存放缓存出错");
         }
     }
@@ -220,7 +252,7 @@ public class OrderRedisService implements  ICache{
      * @author shujiangcheng
      */
     @Override
-    public void put(String key, Object value) {
+    public void putValue(String key, Object value) {
         try {
             redisClient.putValue(key, value);
             keySet.add(key);

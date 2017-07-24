@@ -23,18 +23,6 @@ public class BaseService {
         return orderRedisService;
     }
 
-    protected List<String> getNeedList(){
-        List<String> needKeyList = orderRedisService.getNeedList();
-        if(CollectionUtils.isEmpty(needKeyList)) {
-            return null;
-        }
-
-        List<String> resultList = Lists.newArrayList();
-        for(String key : needKeyList) {
-            resultList.add(reKey(key));
-        }
-        return resultList;
-    }
 
     protected List<String> getKeyList(List<String> keyList, Class type) {
         if(CollectionUtils.isEmpty(keyList)) {

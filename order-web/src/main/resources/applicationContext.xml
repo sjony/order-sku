@@ -32,6 +32,8 @@
 	<!--<import resource="classpath:application-m、q.xml" />-->
 	<import resource="classpath:cache-redis.xml" />
 	<import resource="classpath:spring-mvc.xml" />
+	<import resource="classpath:spring-task.xml" />
+
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
 		  destroy-method="close">
 		<property name="driverClassName" value="${jdbc.driverClassName}" />

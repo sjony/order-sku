@@ -56,13 +56,18 @@
     </update>
 
 
-    <select id="selectSkuQtyBySkuCode" parameterType="java.util.List"  resultType="java.util.List" resultMap="skuQtyEntity" >
+    <select id="selectSkuQtyBySkuCode" parameterType="java.util.List"  resultType="java.util.List" resultMap="skuSaleQtyEntity" >
         SELECT id,sku_code,sale_qty,create_time,update_time,create_user,update_user
         FROM t_sku_sale_qty
         WHERE sku_code IN
         <foreach collection="skuList" item="item" index="index" open="(" separator="," close=")">
             #{item}
         </foreach>
+    </select>
+
+    <select id="selectSkuQtyForRank" parameterType="java.util.List"  resultType="java.util.List" resultMap="skuSaleQtyEntity" >
+        SELECT id,sku_code,sale_qty,create_time,update_time,create_user,update_user
+        FROM t_sku_sale_qty
     </select>
 
 </mapper>

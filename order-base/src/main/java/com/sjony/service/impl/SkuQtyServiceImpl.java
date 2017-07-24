@@ -2,6 +2,7 @@ package com.sjony.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sjony.base.BaseService;
 import com.sjony.dao.SkuQtyDao;
 import com.sjony.entity.SkuQtyEntity;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: 库存相关接口
@@ -133,19 +135,37 @@ public class SkuQtyServiceImpl extends BaseService implements SkuQtyService {
         if(CollectionUtils.isEmpty(skuList)) {
             return null;
         }
-        List<SkuQtyVO> resultList = getRedisCache().getBatch(getKeyList(skuList, SkuQtyVO.class), SkuQtyVO.class);
-        List<String> skuNeedList = getNeedList();
+        List<SkuQtyVO> resultList = getRedisCache().getValueBatch(getKeyList(skuList, SkuQtyVO.class), SkuQtyVO.class);
+        if(skuList.size() == resultList.size()) {
+            return resultList;
+        }
+        /*-----------------------------------------------------------------*
+                                缓存没有读取到的，读取数据库
+        *----------------------------------------------------------------*/
+        List<String> cacheKeyList = Lists.newArrayList();
+        for(SkuQtyVO skuQtyVO : resultList) {
+            cacheKeyList.add(skuQtyVO.getSkuCode());
+        }
+        List<String> skuNeedList = Lists.newArrayList();
+        for(String sku : skuList) {
+            if(!cacheKeyList.contains(sku)) {
+                skuNeedList.add(sku);
+            }
+        }
+
+
         if(CollectionUtils.isNotEmpty(skuNeedList)) {
             logger.warn(JSON.toJSONString(skuNeedList) + "未通过缓存获取到");
             List<SkuQtyEntity> entityList = skuQtyDao.selectSkuQtyBySkuCode(skuNeedList);
             if(CollectionUtils.isNotEmpty(entityList)) {
+                Map<String, Object> cacheMap = Maps.newHashMap();
                 for(SkuQtyEntity entity : entityList) {
                     SkuQtyVO result = new SkuQtyVO();
                     BeanUtils.copyProperties(entity,result);
                     resultList.add(result);
-                    getRedisCache().put(getKey(entity.getSkuCode(),SkuQtyVO.class), result);
+                    cacheMap.put(getKey(result.getSkuCode(), SkuQtyVO.class), result);
                 }
-
+                getRedisCache().putValueBatch(cacheMap);
             }
 
 
