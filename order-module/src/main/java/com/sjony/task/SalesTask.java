@@ -51,7 +51,6 @@ public class SalesTask {
                 SkuSaleQtyVO result = new SkuSaleQtyVO();
                 BeanUtils.copyProperties(entity,result);
                 resultList.add(result);
-                System.out.print("test");
 //                ZSetOperations.TypedTuple<SkuSaleQtyVO> tuple0 = new DefaultTypedTuple<SkuSaleQtyVO>(result, result.getSaleQty().doubleValue());
 //                tuples.add(tuple0);
             }
