@@ -24,4 +24,7 @@ public interface SkuSaleQtyDao {
 
     List<SkuSaleQtyEntity> selectSkuQtyForRank();
 
+    Integer selectCountForRank();
+
+
 }
