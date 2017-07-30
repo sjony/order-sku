@@ -1,7 +1,13 @@
 package com.sjony.cache;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+import redis.clients.jedis.Jedis;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,6 +23,7 @@ import java.util.Set;
 public class RedisClient implements CacheClient {
 
     private RedisTemplate redisTemplate;
+
 
     public RedisClient(RedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -91,6 +98,21 @@ public class RedisClient implements CacheClient {
     @Override
     public <K,V>Map<K,V> getMap(String key) {
         return redisTemplate.opsForHash().entries(key);
+    }
+
+    /**
+     * @Description:获取key对应的key value
+     * @Create on: 2017/7/30 下午1:56
+     * @author jshu
+     *
+     * @param key
+     * @param hk
+     *
+     */
+    @Override
+    public <T> T getMapValue(String key, String hk) {
+
+        return (T) redisTemplate.opsForHash().get(key, hk);
     }
 
     /**
@@ -295,17 +317,37 @@ public class RedisClient implements CacheClient {
         return redisTemplate.opsForZSet().reverseRange(key, start, end);
     }
 
-    /*obj = redisTemplate.execute(new RedisCallback<Object>() {
-        @Override
-        public Object doInRedis(RedisConnection connection) throws DataAccessException {
-            StringRedisSerializer serializer = new StringRedisSerializer();
-            byte[] data = connection.get(serializer.serialize(key));
-            connection.close();
-            if (data == null) {
-                return null;
-            }
-            return serializer.deserialize(data);
-        }
-    });*/
+    /**
+     * @Description:redis分布式锁
+     * @Create on: 2017/7/30 下午2:11
+     * @author jshu
+     *
+     * @param lockName
+     *
+     */
+    @Override
+    public int lock(String lockName) {
+
+        return 0;
+    }
+
+
+    /*private void lock(String key) {
+        Object obj = redisTemplate.execute(new RedisCallback<Object>() {
+                @Override
+                public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                    StringRedisSerializer serializer =  new StringRedisSerializer();
+                    RedisSerializer<String> serializer1 = redisTemplate.getStringSerializer();
+                    byte[] data = connection.get(serializer.serialize(key));
+                    connection.close();
+                    if (data == null) {
+                        return null;
+                    }
+                    return serializer.deserialize(data);
+                }
+            });
+
+    }*/
+
 
 }

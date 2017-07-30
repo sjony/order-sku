@@ -18,6 +18,7 @@ public interface CacheClient {
     void putValue(String key, int exp, Object value);
     void delete(String key);
     <K,V>Map<K,V> getMap(String key);
+    <T>T getMapValue(String key, String hk);
     void putMap(String key, Map value);
     void putMapValue(String key, Object hk, Object value);
     <T>List<T> getList(String key);
@@ -33,6 +34,6 @@ public interface CacheClient {
     void addScore(String key, Object value, Double score);
     <T>Set<T> range(String key, Long start, Long end);
     <T>Set<T> reverseRange(String key, Long start, Long end);
-
+    int lock(String lockName);
 
 }
