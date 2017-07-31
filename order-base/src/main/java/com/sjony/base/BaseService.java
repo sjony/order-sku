@@ -14,10 +14,10 @@ import java.util.List;
 /**
  * Created by sjony on 2017/7/15.
  */
-public class BaseService {
+public class BaseService<K, V> {
 
     @Autowired
-    private ICache orderRedisService;
+    private ICache<K,V> orderRedisService;
 
     protected ICache getRedisCache() {
         return orderRedisService;

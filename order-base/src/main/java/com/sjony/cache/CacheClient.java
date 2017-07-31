@@ -10,30 +10,31 @@ import java.util.Set;
 /**
  * Created by sjony on 2017/7/18.
  */
-public interface CacheClient {
+public interface CacheClient<K,V> {
 
-    <T> List<T> getValue(Collection<?> key);
+    List<V> getValue(Collection<K> key);
     void putBatch(Map map);
-    void putValue(String key, Object value);
-    void putValue(String key, int exp, Object value);
+    void putValue(K key, V value);
+    void putValue(K key, int exp, V value);
     void delete(String key);
-    <K,V>Map<K,V> getMap(String key);
-    <T>T getMapValue(String key, String hk);
-    void putMap(String key, Map value);
-    void putMapValue(String key, Object hk, Object value);
-    <T>List<T> getList(String key);
-    void pushLeft(String key, Object value);
-    void pushRight(String key, Object value);
-    <T>T popLeft(String key);
-    <T>T popRight(String key);
-    <T>Set<T> getSet(String key);
-    void addSet(String key, Object... value);
-    <T>Set<T> intersect(String key, String key1);
-    void addZSet(String key, Object value, Double score);
-    <T>void addZSet(String key, Set<ZSetOperations.TypedTuple<T>> set, Class<T> type);
-    void addScore(String key, Object value, Double score);
-    <T>Set<T> range(String key, Long start, Long end);
-    <T>Set<T> reverseRange(String key, Long start, Long end);
-    int lock(String lockName);
+    Map getMap(K key);
+    <T>T getMapValue(K key, String hk, Class<T> type);
+    void putMap(K key, Map value);
+    void putMapValue(K key, Object hk, Object value);
+    List<V> getList(K key);
+    void pushLeft(K key, V value);
+    void pushRight(K key, V value);
+    V popLeft(K key);
+    V popRight(K key);
+    Set<V> getSet(K key);
+    void addSet(K key, V... value);
+    Set<V> intersect(K key, K key1);
+    void addZSet(K key, V value, Double score);
+    void addZSet(K key, Set<ZSetOperations.TypedTuple<V>> set);
+    void addScore(K key, V value, Double score);
+    Set<V> range(K key, Long start, Long end);
+    Set<V> reverseRange(K key, Long start, Long end);
+    boolean setNX(String lockName, String value);
+    Object getSet(String key, String value);
 
 }

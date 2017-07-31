@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface ICache {
+public interface ICache<K, V> {
 
-    <T> T getValue(String key, Class<T> type);
+    V getValue(K key);
 
-    void putValue(String key, Object value);
+    void putValue(K key, V value);
 
-    void putValueBatch(Map<String,Object> map);
+    void putValueBatch(Map<K,V> map);
 
     void clearKey();
 
@@ -25,20 +25,20 @@ public interface ICache {
 
     void delete(String key);
 
-    <T> List<T> getValueBatch(List<String> key, Class<T> type);
+    List<V> getValueBatch(List<K> key);
 
-    void putMap(String key, Map value);
+    void putMap(K key, Map value);
 
-    void putMapValue(String key, Object hk, Object value);
+    void putMapValue(K key, Object hk, Object value);
 
-    void addZSet(String key, Object value, Double score);
+    void addZSet(K key, V value, Double score);
 
-    void addScore(String key, Object value, Double score);
+    void addScore(K key, V value, Double score);
 
-    <T> T getMap(String key, Class<T> type);
+    <T> T getMap(K key, Class<T> type);
 
-    <T>Set<T> range(String key, Long start, Long end, Class<T> type);
+    Set<V> range(K key, Long start, Long end);
 
-    <T>void addZSet(String key, Set<ZSetOperations.TypedTuple<T>> set, Class<T> type);
+    void addZSet(K key, Set<ZSetOperations.TypedTuple<V>> set);
 
 }

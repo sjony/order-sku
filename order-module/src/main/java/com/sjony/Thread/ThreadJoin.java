@@ -3,7 +3,9 @@ package com.sjony.Thread;
 import com.google.common.collect.Lists;
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by sjony on 2017/7/29.
@@ -38,7 +40,15 @@ public class ThreadJoin {
         for(String s : a) {
             System.out.println(s);
         }
+        List<String> aaa = new ArrayList<String>();
+        aaa.add("23");
+        String s = getNum(aaa);
 
+    }
+
+
+    private static <T>T getNum(List<T> t) {
+        return t.get(0);
     }
 
 }

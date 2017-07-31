@@ -20,10 +20,10 @@ import java.util.Set;
  *
  * @author shujiangcheng
  */
-public class OrderRedisService implements  ICache{
+public class OrderRedisService<K, V> implements ICache<K, V>{
 
 
-    private CacheClient redisClient;
+    private CacheClient<K, V> redisClient;
 
     private static Set<String> keySet = Sets.newHashSet();
     private static Set<String> mapkeySet = Sets.newHashSet();
@@ -38,11 +38,11 @@ public class OrderRedisService implements  ICache{
     }
 
     @Override
-    public <T> T getValue(String key, Class<T> type) {
-        T value = null;
-        List<String> keyList = Lists.newArrayList(key);
+    public V getValue(K key) {
+        V value = null;
+        List<K> keyList = Lists.newArrayList(key);
         try {
-            List<T> valueList = redisClient.getValue(keyList);
+            List<V> valueList = redisClient.getValue(keyList);
             value =  valueList.get(0);
             if (logger.isDebugEnabled()) {
                 logger.debug("get cache: key is " + key + ", value is " + value);
@@ -61,11 +61,11 @@ public class OrderRedisService implements  ICache{
      * @author shujiangcheng
      */
     @Override
-    public void putValueBatch(Map<String,Object> map) {
+    public void putValueBatch(Map<K,V> map) {
         try {
             redisClient.putBatch(map);
-            for(String key : map.keySet()) {
-                keySet.add(key);
+            for(K key : map.keySet()) {
+                keySet.add(key.toString());
             }
             if (logger.isDebugEnabled()) {
                 logger.debug("put cache: key is " + map.keySet() + ", value is " + map.values());
@@ -76,10 +76,10 @@ public class OrderRedisService implements  ICache{
     }
 
     @Override
-    public <T> List<T> getValueBatch(List<String> keyList, Class<T> type) {
-        List<T> result = Lists.newArrayList();
+    public List<V> getValueBatch(List<K> keyList) {
+        List<V> result = Lists.newArrayList();
         try {
-            T value = null;
+            V value = null;
             result = redisClient.getValue(keyList);
                 if (logger.isDebugEnabled()) {
                     logger.debug("get cache: key is " + JSON.toJSONString(keyList) + ", value is " + value);
@@ -100,10 +100,10 @@ public class OrderRedisService implements  ICache{
      * @author shujiangcheng
      */
     @Override
-    public void putMap(String key, Map value) {
+    public void putMap(K key, Map value) {
         try {
             redisClient.putMap(key, value);
-            mapkeySet.add(key);
+            mapkeySet.add(key.toString());
             if (logger.isDebugEnabled()) {
                 logger.debug("put cache: key is " + key + ", value is " + value);
             }
@@ -123,10 +123,10 @@ public class OrderRedisService implements  ICache{
      *
      */
     @Override
-    public void putMapValue(String key, Object hk, Object value) {
+    public void putMapValue(K key, Object hk, Object value) {
         try {
             redisClient.putMapValue(key, hk, value);
-            mapkeySet.add(key);
+            mapkeySet.add(key.toString());
             if (logger.isDebugEnabled()) {
                 logger.debug("put cache: key is " + key + ", value is " + value);
             }
@@ -146,10 +146,10 @@ public class OrderRedisService implements  ICache{
      *
      */
     @Override
-    public void addZSet(String key, Object value, Double score) {
+    public void addZSet(K key, V value, Double score) {
         try {
             redisClient.addZSet(key, value, score);
-            setkeySet.add(key);
+            setkeySet.add(key.toString());
             if (logger.isDebugEnabled()) {
                 logger.debug("put cache: key is " + key + ", value is " + value);
             }
@@ -164,10 +164,11 @@ public class OrderRedisService implements  ICache{
      *
      * @author shujiangcheng
      */
-    public <T>void addZSet(String key, Set<ZSetOperations.TypedTuple<T>> set, Class<T> type) {
+    @Override
+    public void addZSet(K key, Set<ZSetOperations.TypedTuple<V>> set) {
         try {
-            redisClient.addZSet(key, set, type);
-            setkeySet.add(key);
+            redisClient.addZSet(key, set);
+            setkeySet.add(key.toString());
             if (logger.isDebugEnabled()) {
                 logger.debug("put cache: key is " + key + ", value is " + set);
             }
@@ -188,10 +189,10 @@ public class OrderRedisService implements  ICache{
      *
      */
     @Override
-    public void addScore(String key, Object value, Double score) {
+    public void addScore(K key, V value, Double score) {
         try {
             redisClient.addScore(key, value, score);
-            setkeySet.add(key);
+            setkeySet.add(key.toString());
             if (logger.isDebugEnabled()) {
                 logger.debug("put cache: key is " + key + ", value is " + value);
             }
@@ -207,7 +208,7 @@ public class OrderRedisService implements  ICache{
      * @author shujiangcheng
      */
     @Override
-    public <T> T getMap(String key, Class<T> type) {
+    public <T> T getMap(K key, Class<T> type) {
         T value = null;
         try {
             Map valueMap = redisClient.getMap(key);
@@ -231,8 +232,8 @@ public class OrderRedisService implements  ICache{
      * @author shujiangcheng
      */
     @Override
-    public <T> Set<T> range(String key, Long start, Long end, Class<T> type) {
-        Set<T> value = null;
+    public Set<V> range(K key, Long start, Long end) {
+        Set<V> value = null;
         try {
             value = redisClient.range(key, start, end);
             if (logger.isDebugEnabled()) {
@@ -245,6 +246,7 @@ public class OrderRedisService implements  ICache{
         return value;
     }
 
+
     /**
      * @Description: 存放值
      * @Create on: 2017/7/21 下午3:06 
@@ -252,10 +254,10 @@ public class OrderRedisService implements  ICache{
      * @author shujiangcheng
      */
     @Override
-    public void putValue(String key, Object value) {
+    public void putValue(K key, V value) {
         try {
             redisClient.putValue(key, value);
-            keySet.add(key);
+            keySet.add(key.toString());
             if (logger.isDebugEnabled()) {
                 logger.debug("put cache: key is " + key + ", value is " + value);
             }

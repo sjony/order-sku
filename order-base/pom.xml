@@ -186,12 +186,12 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
-            <version>1.6.0.RELEASE</version>
+            <version>1.8.5.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>2.7.3</version>
+            <version>2.8.1</version>
         </dependency>
         <!-- memcached缓存 -->
         <dependency>

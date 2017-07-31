@@ -5,6 +5,7 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.core.script.ScriptExecutor;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.Jedis;
@@ -20,25 +21,19 @@ import java.util.Set;
  *
  * @author shujiangcheng
  */
-public class RedisClient implements CacheClient {
+public class RedisClient<K, V> implements CacheClient<K,V> {
 
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<K, V> redisTemplate;
 
 
     public RedisClient(RedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
-    /**
-     *
-     *  @author sjony
-     *  @description :获取一般value
-     *  @CreateTime : 0:12 2017/7/21
-     *  @param
-     */
+
     @Override
-    public <T> List<T> getValue(Collection<?> keys) {
-        return  redisTemplate.opsForValue().multiGet(keys);
+    public List<V> getValue(Collection<K> key) {
+        return redisTemplate.opsForValue().multiGet(key);
     }
 
     /**
@@ -60,7 +55,7 @@ public class RedisClient implements CacheClient {
      *  @param
      */
     @Override
-    public void putValue(String key, Object value) {
+    public void putValue(K key, V value) {
         putValue(key, 0, value);
     }
 
@@ -72,7 +67,7 @@ public class RedisClient implements CacheClient {
      *  @param
      */
     @Override
-    public void putValue(String key, int exp, Object value) {
+    public void putValue(K key, int exp, V value) {
         redisTemplate.opsForValue().set(key, value, exp);
     }
 
@@ -85,7 +80,7 @@ public class RedisClient implements CacheClient {
      */
     @Override
     public void delete(String key) {
-        redisTemplate.delete(key);
+        redisTemplate.delete((K) key);
     }
 
     /**
@@ -96,7 +91,7 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public <K,V>Map<K,V> getMap(String key) {
+    public Map getMap(K key) {
         return redisTemplate.opsForHash().entries(key);
     }
 
@@ -110,8 +105,7 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public <T> T getMapValue(String key, String hk) {
-
+    public <T> T getMapValue(K key, String hk, Class<T> type) {
         return (T) redisTemplate.opsForHash().get(key, hk);
     }
 
@@ -125,7 +119,7 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public void putMap(String key, Map value) {
+    public void putMap(K key, Map value) {
 
         redisTemplate.opsForHash().putAll(key, value);
     }
@@ -141,7 +135,7 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public void putMapValue(String key, Object hk, Object value) {
+    public void putMapValue(K key, Object hk, Object value) {
         redisTemplate.opsForHash().put( key, hk, value);
     }
 
@@ -154,7 +148,7 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public <T> List<T> getList(String key) {
+    public List<V> getList(K key) {
         return redisTemplate.opsForList().range(key, 0, redisTemplate.opsForList().size(key));
     }
 
@@ -168,7 +162,7 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public void pushLeft(String key, Object value) {
+    public void pushLeft(K key, V value) {
         redisTemplate.opsForList().leftPush(key, value);
     }
 
@@ -182,7 +176,7 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public void pushRight(String key, Object value) {
+    public void pushRight(K key, V value) {
 
         redisTemplate.opsForList().rightPush(key, value);
     }
@@ -196,9 +190,9 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public <T> T popLeft(String key) {
+    public V popLeft(K key) {
 
-        return (T) redisTemplate.opsForList().leftPop(key);
+        return  redisTemplate.opsForList().leftPop(key);
     }
 
     /**
@@ -210,8 +204,8 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public <T> T popRight(String key) {
-        return (T) redisTemplate.opsForList().rightPop(key);
+    public V popRight(K key) {
+        return  redisTemplate.opsForList().rightPop(key);
     }
 
     /**
@@ -223,7 +217,7 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public <T> Set<T> getSet(String key) {
+    public  Set<V> getSet(K key) {
         return redisTemplate.opsForSet().members(key);
     }
 
@@ -234,7 +228,7 @@ public class RedisClient implements CacheClient {
      * @author shujiangcheng
      */
     @Override
-    public void addSet(String key, Object... value) {
+    public void addSet(K key, V... value) {
 
     }
 
@@ -248,7 +242,7 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public <T> Set<T> intersect(String key, String key1) {
+    public  Set<V> intersect(K key, K key1) {
         return redisTemplate.opsForSet().intersect(key, key1);
     }
 
@@ -263,11 +257,11 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public void addZSet(String key, Object value, Double score) {
+    public void addZSet(K key, V value, Double score) {
         redisTemplate.opsForZSet().add(key, value, score);
     }
 
-    public <T>void addZSet(String key, Set<ZSetOperations.TypedTuple<T>> set, Class<T> type) {
+    public void addZSet(K key, Set<ZSetOperations.TypedTuple<V>> set) {
         redisTemplate.opsForZSet().add(key, set);
     }
 
@@ -282,7 +276,7 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public void addScore(String key, Object value, Double score) {
+    public void addScore(K key, V value, Double score) {
         redisTemplate.opsForZSet().incrementScore(key, value, score);
     }
 
@@ -297,7 +291,7 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public <T> Set<T> range(String key, Long start, Long end) {
+    public Set<V> range(K key, Long start, Long end) {
 
         return redisTemplate.opsForZSet().reverseRange(key, start, end);
     }
@@ -313,7 +307,7 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public <T> Set<T> reverseRange(String key, Long start, Long end) {
+    public  Set<V> reverseRange(K key, Long start, Long end) {
         return redisTemplate.opsForZSet().reverseRange(key, start, end);
     }
 
@@ -326,28 +320,40 @@ public class RedisClient implements CacheClient {
      *
      */
     @Override
-    public int lock(String lockName) {
-
-        return 0;
+    public boolean setNX(String lockName, String lockValue) {
+        boolean res = redisTemplate.execute(new RedisCallback<Boolean>() {
+            public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
+                RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
+                byte[] key = serializer.serialize(lockName);
+                byte[] value = serializer.serialize(lockValue);
+                //set not exits
+                return connection.setNX(key, value);
+            }
+        });
+        return res;
     }
 
+    @Override
+    public Object getSet(String key, String value) {
+        Object result = false;
 
-    /*private void lock(String key) {
-        Object obj = redisTemplate.execute(new RedisCallback<Object>() {
-                @Override
-                public Object doInRedis(RedisConnection connection) throws DataAccessException {
-                    StringRedisSerializer serializer =  new StringRedisSerializer();
-                    RedisSerializer<String> serializer1 = redisTemplate.getStringSerializer();
-                    byte[] data = connection.get(serializer.serialize(key));
-                    connection.close();
-                    if (data == null) {
-                        return null;
+        result =  redisTemplate
+                .execute(new RedisCallback<Object>() {
+                    @Override
+                    public Object doInRedis(RedisConnection connection) throws DataAccessException {
+//                StringRedisSerializer serializer =  new StringRedisSerializer();
+                        RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
+                        byte[] data = connection.get(serializer.serialize(key));
+                        byte[] valueByte = connection.get(serializer.serialize(value));
+                        Object result = connection.getSet(data, valueByte);
+                        connection.close();
+                        return result;
                     }
-                    return serializer.deserialize(data);
-                }
-            });
+                });
 
-    }*/
+
+        return result;
+    }
 
 
 }

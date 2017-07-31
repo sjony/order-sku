@@ -26,7 +26,7 @@ import java.util.Map;
  * @author shujiangcheng
  */
 @Service
-public class SkuQtyServiceImpl extends BaseService implements SkuQtyService {
+public class SkuQtyServiceImpl extends BaseService<String, SkuQtyVO> implements SkuQtyService {
 
     @Autowired
     private SkuQtyDao skuQtyDao;
@@ -135,7 +135,7 @@ public class SkuQtyServiceImpl extends BaseService implements SkuQtyService {
         if(CollectionUtils.isEmpty(skuList)) {
             return null;
         }
-        List<SkuQtyVO> resultList = getRedisCache().getValueBatch(getKeyList(skuList, SkuQtyVO.class), SkuQtyVO.class);
+        List<SkuQtyVO> resultList = getRedisCache().getValueBatch(getKeyList(skuList, SkuQtyVO.class));
         if(skuList.size() == resultList.size()) {
             return resultList;
         }

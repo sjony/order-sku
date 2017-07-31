@@ -74,7 +74,7 @@ public class SalesJob implements Runnable {
             }
 
             long t1 = System.currentTimeMillis();
-            orderRedisService.addZSet(Constants.SALE_TASK, tuples, SkuSaleQtyVO.class);
+            orderRedisService.addZSet(Constants.SALE_TASK, tuples);
             /*for(SkuSaleQtyVO skuSaleQtyVO : resultList) {
                 orderRedisService.addZSet(Constants.SALE_TASK, skuSaleQtyVO, skuSaleQtyVO.getSaleQty().doubleValue());
             }*/

@@ -20,13 +20,13 @@ import java.util.Set;
  * @author shujiangcheng
  */
 @Service
-public class SkuSaleQtyServiceImpl extends BaseService implements SkuSaleQtyService {
+public class SkuSaleQtyServiceImpl extends BaseService <String, SkuSaleQtyVO>implements SkuSaleQtyService {
 
     @Autowired
     private SkuSaleQtyDao skuSaleQtyDao;
 
     @Override
     public Set<SkuSaleQtyVO> getSkuQtyForRank() {
-        return getRedisCache().range(Constants.SALE_TASK,0L,19L, SkuSaleQtyVO.class);
+        return getRedisCache().range(Constants.SALE_TASK,0L,19L);
     }
 }
