@@ -41,4 +41,9 @@ public interface ICache<K, V> {
 
     void addZSet(K key, Set<ZSetOperations.TypedTuple<V>> set);
 
+    Boolean setNX(String lockKey, String lockValue);
+
+    Object getSet(String lockKey, String lockValue);
+
+
 }

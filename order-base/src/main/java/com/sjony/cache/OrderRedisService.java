@@ -179,6 +179,48 @@ public class OrderRedisService<K, V> implements ICache<K, V>{
     }
 
     /**
+     * @Description:  redis锁
+     * @Create on: 2017/8/1 下午7:40 
+     *
+     * @author shujiangcheng
+     */
+    @Override
+    public Boolean setNX(String lockKey, String lockValue) {
+        Boolean lock = false;
+        try {
+            lock = redisClient.setNX(lockKey, lockValue);
+            if (logger.isDebugEnabled()) {
+                logger.debug("put cache: key is " + lockKey + ", value is " + lockValue);
+            }
+        } catch (Exception e2) {
+            e2.printStackTrace();
+            logger.error("redis加锁失败");
+        }
+        return lock;
+    }
+
+    /**
+     * @Description: redis锁
+     * @Create on: 2017/8/1 下午7:40 
+     *
+     * @author shujiangcheng
+     */
+    @Override
+    public Object getSet(String lockKey, String lockValue) {
+        Object old = false;
+        try {
+            old = redisClient.getSet(lockKey, lockValue);
+            if (logger.isDebugEnabled()) {
+                logger.debug("put cache: key is " + lockKey + ", value is " + lockValue);
+            }
+        } catch (Exception e2) {
+            e2.printStackTrace();
+            logger.error("redis返回锁久信息失败");
+        }
+        return old;
+    }
+
+    /**
      * @Description:新增score值
      * @Create on: 2017/7/21 下午2:54
      * @author jshu

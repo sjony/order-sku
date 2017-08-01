@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sjony.base.BaseService;
+import com.sjony.commons.Constants;
 import com.sjony.dao.SkuQtyDao;
 import com.sjony.entity.SkuQtyEntity;
 import com.sjony.service.SkuQtyService;
@@ -18,6 +19,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @Description: 库存相关接口
@@ -81,6 +83,33 @@ public class SkuQtyServiceImpl extends BaseService<String, SkuQtyVO> implements 
         int result = skuQtyDao.updateQtyForSale(skuCode);
         return result;
     }
+
+    /**
+     * @Description: 更新库存 秒杀
+     * @Create on: 2017/7/15 下午2:00
+     *
+     * @author shujiangcheng
+     */
+    public int updateQtyForSale(String skuCode, int i) {
+        if(StringUtils.isEmpty(skuCode)) {
+            return 0;
+        }
+        long t1 = System.currentTimeMillis();
+        while(true) {
+            boolean lock = getRedisCache().setNX(Constants.LOCK_SECKILL, String.valueOf(t1));
+            if(!lock) {
+                long t2 = System.currentTimeMillis();
+                if((t2-t1) > 3000) {
+                    return 2;
+                }
+            }
+            if(lock){
+                getRedisCache().getMap()
+            }
+        }
+    }
+
+
 
     /**
      * @Description: 更新库存 购物 
