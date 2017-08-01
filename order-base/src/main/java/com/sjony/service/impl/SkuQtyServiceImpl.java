@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sjony.base.BaseService;
+import com.sjony.cache.CacheClient;
+import com.sjony.cache.ICache;
 import com.sjony.commons.Constants;
 import com.sjony.dao.SkuQtyDao;
 import com.sjony.entity.SkuQtyEntity;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -34,6 +37,9 @@ public class SkuQtyServiceImpl extends BaseService<String, SkuQtyVO> implements 
     private SkuQtyDao skuQtyDao;
 
     private static final Logger logger = LoggerFactory.getLogger(SkuQtyServiceImpl.class);
+
+    @Autowired
+    private ICache orderRedisService;
 
 
     /**
@@ -94,17 +100,31 @@ public class SkuQtyServiceImpl extends BaseService<String, SkuQtyVO> implements 
         if(StringUtils.isEmpty(skuCode)) {
             return 0;
         }
-        long t1 = System.currentTimeMillis();
+        String key = getKey(skuCode, SkuQtyVO.class);
+        long wantlockTime = System.currentTimeMillis();
         while(true) {
-            boolean lock = getRedisCache().setNX(Constants.LOCK_SECKILL, String.valueOf(t1));
+            boolean lock = orderRedisService.setNX(Constants.LOCK_SECKILL, String.valueOf(wantlockTime));
             if(!lock) {
-                long t2 = System.currentTimeMillis();
-                if((t2-t1) > 3000) {
+                long nowThreadTime = System.currentTimeMillis();
+                long lockTiemLatest = (long) orderRedisService.getValue(Constants.LOCK_SECKILL);
+                if((nowThreadTime-lockTiemLatest) > 10000) {
                     return 2;
                 }
+                if((nowThreadTime-lockTiemLatest) > 3000) {
+                   lockTiemLatest = (long) orderRedisService.getValue(Constants.LOCK_SECKILL);
+                   long  lockTime = (long) orderRedisService.getSet(Constants.LOCK_SECKILL, String.valueOf(nowThreadTime));
+                    if(lockTime == wantlockTime) {
+                        lock = true;
+                    }
+                }
+
+
             }
             if(lock){
-                getRedisCache().getMap()
+                BigDecimal skuQty = (BigDecimal) orderRedisService.getMapValue(key,  Constants.SKU_QTY, BigDecimal.class);
+                skuQty = skuQty.subtract(BigDecimal.ONE);
+                orderRedisService.putMapValue(key,  Constants.SKU_QTY, skuQty);
+                orderRedisService.delete(Constants.LOCK_SECKILL);
             }
         }
     }

@@ -267,6 +267,21 @@ public class OrderRedisService<K, V> implements ICache<K, V>{
         return value;
     }
 
+    @Override
+    public <T> T getMapValue(K key, String hk, Class<T> type) {
+        T value = null;
+        try {
+            value = redisClient.getMapValue(key, hk, type);
+            if (logger.isDebugEnabled()) {
+                logger.debug("get cache: key is " + key + ", value is " + value);
+            }
+        } catch (Exception e2) {
+            logger.error("获取缓存出错", e2);
+        }
+
+        return value;
+    }
+
     /**
      * @Description: 获取排序的set
      * @Create on: 2017/7/21 下午3:08 

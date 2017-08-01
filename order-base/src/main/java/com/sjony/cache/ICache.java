@@ -37,6 +37,8 @@ public interface ICache<K, V> {
 
     <T> T getMap(K key, Class<T> type);
 
+    <T> T getMapValue(K key, String hk, Class<T> type);
+
     Set<V> range(K key, Long start, Long end);
 
     void addZSet(K key, Set<ZSetOperations.TypedTuple<V>> set);

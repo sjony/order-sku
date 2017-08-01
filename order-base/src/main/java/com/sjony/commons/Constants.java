@@ -13,5 +13,6 @@ public class Constants {
 
     public static final String LOCK_SECKILL = "LOCK_SECKILL";
 
+    public static final String SKU_QTY = "skuQty";
 
 }
