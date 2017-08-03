@@ -6,6 +6,7 @@ import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.core.script.ScriptExecutor;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.Jedis;
@@ -324,8 +325,9 @@ public class RedisClient<K, V> implements CacheClient<K,V> {
         boolean res = redisTemplate.execute(new RedisCallback<Boolean>() {
             public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
                 RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
+                JdkSerializationRedisSerializer valueSerializer = new JdkSerializationRedisSerializer();
                 byte[] key = serializer.serialize(lockName);
-                byte[] value = serializer.serialize(lockValue);
+                byte[] value = valueSerializer.serialize(lockValue);
                 //set not exits
                 return connection.setNX(key, value);
             }

@@ -24,8 +24,8 @@ public interface SkuQtyService {
 
     int updateSkuQtyBatch(List<SkuQtyVO> skuQtyList);
 
-    List<SkuQtyVO> getSkuQtyListBySkuList(List<String> skuList);
+    List<SkuQtyVO> getSkuQtyListBySkuList(List<String> skuList, boolean isCache);
 
-    SkuQtyVO getSkuQtyBySkuCode(String skuCode);
+    SkuQtyVO getSkuQtyBySkuCode(String skuCode, boolean isCache);
 
 }

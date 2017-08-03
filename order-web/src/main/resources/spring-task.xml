@@ -20,8 +20,8 @@
         <!--
             这里表示的是每天1点执行一次
         -->
-        <!--<task:scheduled ref="SalesTask" method="saleRankTask" cron="0 0 1 * * ?" />-->
-        <task:scheduled ref="SalesTask" method="saleRankTask" cron="*/60 * * * * ?" />
+        <task:scheduled ref="SalesTask" method="saleRankTask" cron="0 0 1 * * ?" />
+        <!--<task:scheduled ref="SalesTask" method="saleRankTask" cron="*/60 * * * * ?" />-->
 
         <!--//@Scheduled(cron = "0 0 1 * * ?")//每天凌晨1点整
         //@Scheduled(cron = "0 30 0 * * ?")//每天凌晨0点30分

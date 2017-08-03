@@ -89,7 +89,7 @@ public class OrderSkuQtyServiceImpl implements OrderSkuQtyService {
             return result;
         }
 
-        result = skuQtyService.getSkuQtyListBySkuList(skuCodeList);
+        result = skuQtyService.getSkuQtyListBySkuList(skuCodeList, true);
 
         return result;
     }

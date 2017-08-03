@@ -38,9 +38,6 @@ public class SkuQtyServiceImpl extends BaseService<String, SkuQtyVO> implements 
 
     private static final Logger logger = LoggerFactory.getLogger(SkuQtyServiceImpl.class);
 
-    @Autowired
-    private ICache orderRedisService;
-
 
     /**
      * @Description: 插入库存信息
@@ -90,44 +87,7 @@ public class SkuQtyServiceImpl extends BaseService<String, SkuQtyVO> implements 
         return result;
     }
 
-    /**
-     * @Description: 更新库存 秒杀
-     * @Create on: 2017/7/15 下午2:00
-     *
-     * @author shujiangcheng
-     */
-    public int updateQtyForSale(String skuCode, int i) {
-        if(StringUtils.isEmpty(skuCode)) {
-            return 0;
-        }
-        String key = getKey(skuCode, SkuQtyVO.class);
-        long wantlockTime = System.currentTimeMillis();
-        while(true) {
-            boolean lock = orderRedisService.setNX(Constants.LOCK_SECKILL, String.valueOf(wantlockTime));
-            if(!lock) {
-                long nowThreadTime = System.currentTimeMillis();
-                long lockTiemLatest = (long) orderRedisService.getValue(Constants.LOCK_SECKILL);
-                if((nowThreadTime-lockTiemLatest) > 10000) {
-                    return 2;
-                }
-                if((nowThreadTime-lockTiemLatest) > 3000) {
-                   lockTiemLatest = (long) orderRedisService.getValue(Constants.LOCK_SECKILL);
-                   long  lockTime = (long) orderRedisService.getSet(Constants.LOCK_SECKILL, String.valueOf(nowThreadTime));
-                    if(lockTime == wantlockTime) {
-                        lock = true;
-                    }
-                }
 
-
-            }
-            if(lock){
-                BigDecimal skuQty = (BigDecimal) orderRedisService.getMapValue(key,  Constants.SKU_QTY, BigDecimal.class);
-                skuQty = skuQty.subtract(BigDecimal.ONE);
-                orderRedisService.putMapValue(key,  Constants.SKU_QTY, skuQty);
-                orderRedisService.delete(Constants.LOCK_SECKILL);
-            }
-        }
-    }
 
 
 
@@ -180,29 +140,39 @@ public class SkuQtyServiceImpl extends BaseService<String, SkuQtyVO> implements 
      * @author shujiangcheng
      */
     @Override
-    public List<SkuQtyVO> getSkuQtyListBySkuList(List<String> skuList) {
+    public List<SkuQtyVO> getSkuQtyListBySkuList(List<String> skuList, boolean isCache) {
         if(CollectionUtils.isEmpty(skuList)) {
             return null;
         }
-        List<SkuQtyVO> resultList = getRedisCache().getValueBatch(getKeyList(skuList, SkuQtyVO.class));
-        if(skuList.size() == resultList.size()) {
-            return resultList;
+        List<SkuQtyVO> resultList = Lists.newArrayList();
+        if(isCache) {
+            resultList = getRedisCache().getValueBatch(getKeyList(skuList, SkuQtyVO.class));
+            if(skuList.size() == resultList.size()) {
+                return resultList;
+            }
         }
         /*-----------------------------------------------------------------*
                                 缓存没有读取到的，读取数据库
         *----------------------------------------------------------------*/
-        List<String> cacheKeyList = Lists.newArrayList();
-        for(SkuQtyVO skuQtyVO : resultList) {
-            cacheKeyList.add(skuQtyVO.getSkuCode());
-        }
-        List<String> skuNeedList = Lists.newArrayList();
-        for(String sku : skuList) {
-            if(!cacheKeyList.contains(sku)) {
-                skuNeedList.add(sku);
+        List<String> skuNeedList = Lists.newArrayList();  //需要读取数据库的sku
+        List<String> cacheKeyList = Lists.newArrayList(); //缓存获取的sku
+
+        if(CollectionUtils.isNotEmpty(resultList)) {
+            for(SkuQtyVO skuQtyVO : resultList) {
+                cacheKeyList.add(skuQtyVO.getSkuCode());
             }
+            for(String sku : skuList) {
+                if(!cacheKeyList.contains(sku)) {
+                    skuNeedList.add(sku);
+                }
+            }
+        } else {
+            skuNeedList = skuList;
         }
 
 
+
+        //缓存未获取的读取数据库
         if(CollectionUtils.isNotEmpty(skuNeedList)) {
             logger.warn(JSON.toJSONString(skuNeedList) + "未通过缓存获取到");
             List<SkuQtyEntity> entityList = skuQtyDao.selectSkuQtyBySkuCode(skuNeedList);
@@ -214,7 +184,9 @@ public class SkuQtyServiceImpl extends BaseService<String, SkuQtyVO> implements 
                     resultList.add(result);
                     cacheMap.put(getKey(result.getSkuCode(), SkuQtyVO.class), result);
                 }
-                getRedisCache().putValueBatch(cacheMap);
+                if(isCache) {
+                    getRedisCache().putValueBatch(cacheMap);
+                }
             }
 
 
@@ -229,12 +201,12 @@ public class SkuQtyServiceImpl extends BaseService<String, SkuQtyVO> implements 
      * @author shujiangcheng
      */
     @Override
-    public SkuQtyVO getSkuQtyBySkuCode(String skuCode) {
+    public SkuQtyVO getSkuQtyBySkuCode(String skuCode, boolean isCache) {
         if(StringUtils.isEmpty(skuCode)) {
             return null;
         }
         List<String> skuList = Lists.newArrayList(skuCode);
-        List<SkuQtyVO> resultList = getSkuQtyListBySkuList(skuList);
+        List<SkuQtyVO> resultList = getSkuQtyListBySkuList(skuList, isCache);
         if(CollectionUtils.isEmpty(resultList)) {
             return null;
         }

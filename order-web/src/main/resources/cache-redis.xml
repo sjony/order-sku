@@ -12,7 +12,6 @@
 
     <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
         <property name="maxIdle" value="${redis.maxIdle}" />
-        <property name="maxTotal" value="${redis.maxTotal}" />
         <property name="maxWaitMillis" value="${redis.maxWait}" />
         <property name="testOnBorrow" value="${redis.testOnBorrow}" />
     </bean>
@@ -23,7 +22,7 @@
         <property name="port" value="${redis.port}" />
         <property name="hostName" value="${redis.host}" />
         <property name="password" value="${redis.password}" />
-        <property name="timeout" value="${redis.timeout}"/>
+        <property name="timeout" value="${redis.timeout}"></property>
     </bean>
     <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
         <property name="connectionFactory" ref="connectionRedisFactory" />
