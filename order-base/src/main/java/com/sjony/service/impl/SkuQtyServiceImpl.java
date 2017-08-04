@@ -145,32 +145,24 @@ public class SkuQtyServiceImpl extends BaseService<String, SkuQtyVO> implements 
             return null;
         }
         List<SkuQtyVO> resultList = Lists.newArrayList();
+        List<String> skuNeedList = Lists.newArrayList();  //需要读取数据库的sku
+        skuNeedList.addAll(skuList);
         if(isCache) {
-            resultList = getRedisCache().getValueBatch(getKeyList(skuList, SkuQtyVO.class));
-            if(skuList.size() == resultList.size()) {
-                return resultList;
+            List<String> cacheSkuList = Lists.newArrayList();
+            for(String skuCode : skuList) {
+                boolean hasKey = getRedisCache().hasKey(getKey(skuCode, SkuQtyVO.class));
+                if(hasKey) {
+                    cacheSkuList.add(skuCode);
+                    skuNeedList.remove(skuCode);
+                }
+            }
+            if(CollectionUtils.isNotEmpty(cacheSkuList)) {
+                resultList = getRedisCache().getValueBatch(getKeyList(cacheSkuList, SkuQtyVO.class));
             }
         }
         /*-----------------------------------------------------------------*
                                 缓存没有读取到的，读取数据库
         *----------------------------------------------------------------*/
-        List<String> skuNeedList = Lists.newArrayList();  //需要读取数据库的sku
-        List<String> cacheKeyList = Lists.newArrayList(); //缓存获取的sku
-
-        if(CollectionUtils.isNotEmpty(resultList)) {
-            for(SkuQtyVO skuQtyVO : resultList) {
-                cacheKeyList.add(skuQtyVO.getSkuCode());
-            }
-            for(String sku : skuList) {
-                if(!cacheKeyList.contains(sku)) {
-                    skuNeedList.add(sku);
-                }
-            }
-        } else {
-            skuNeedList = skuList;
-        }
-
-
 
         //缓存未获取的读取数据库
         if(CollectionUtils.isNotEmpty(skuNeedList)) {

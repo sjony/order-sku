@@ -7,6 +7,8 @@ import com.sjony.commons.Constants;
 import com.sjony.service.SkuSaleSeckillService;
 import com.sjony.utils.CollectionUtils;
 import com.sjony.vo.SkuQtyVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -26,6 +28,10 @@ import java.util.Map;
 @Service
 public class SkuSaleSeckillServiceImpl extends BaseService implements SkuSaleSeckillService {
 
+    private static final long EXPIRE_TIME = 3000;
+
+    private static final Logger logger = LoggerFactory.getLogger(SkuSaleSeckillServiceImpl.class);
+
 
     /**
      * @Description: 更新库存 秒杀
@@ -38,20 +44,40 @@ public class SkuSaleSeckillServiceImpl extends BaseService implements SkuSaleSec
         if(StringUtils.isEmpty(skuCode)) {
             return 0;
         }
+        String key = getKey(skuCode, SkuQtyVO.class);
+        String lockKey = getLockKey(skuCode, SkuQtyVO.class);
         try {
-            String key = getKey(skuCode, SkuQtyVO.class);
-            long wantlockTime = System.currentTimeMillis();
+
             while(true) {
-                boolean lock = getRedisCache().setNX(Constants.LOCK_SECKILL, String.valueOf(wantlockTime));
+                long wantlockTime = System.currentTimeMillis();
+                boolean lock = getRedisCache().setNX(lockKey, String.valueOf(wantlockTime));
                 if(!lock) {
                     long nowThreadTime = System.currentTimeMillis();
-                    long lockTiemLatest = (long) getRedisCache().getValue(Constants.LOCK_SECKILL);
+                    Object lockTiemLatestObject = getRedisCache().getValue(lockKey);
+                    long lockTiemLatest = 0;
+                    if(null == lockTiemLatestObject) {
+                        continue;
+                    } else {
+                        lockTiemLatest = Long.valueOf((String)lockTiemLatestObject);
+                    }
                     if((nowThreadTime-lockTiemLatest) > 10000) {
+                        logger.warn("超时了，请重试");
                         return 2;
                     }
-                    if((nowThreadTime-lockTiemLatest) > 3000) {
-                        lockTiemLatest = (long) getRedisCache().getValue(Constants.LOCK_SECKILL);
-                        long  lockTime = (long) getRedisCache().getSet(Constants.LOCK_SECKILL, String.valueOf(nowThreadTime));
+                    if((nowThreadTime-lockTiemLatest) > EXPIRE_TIME) {
+                        lockTiemLatestObject = getRedisCache().getValue(lockKey);
+                        if(null == lockTiemLatestObject) {
+                            continue;
+                        } else {
+                            lockTiemLatest = Long.valueOf((String)lockTiemLatestObject);
+                        }
+                        Object lockTimeObject = getRedisCache().getSet(lockKey, String.valueOf(nowThreadTime));
+                        long  lockTime = 0;
+                        if(null == lockTiemLatestObject) {
+                            continue;
+                        } else {
+                            lockTime = Long.valueOf((String)lockTimeObject);
+                        }
                         if(lockTime == lockTiemLatest) {
                             lock = true;
                         }
@@ -61,15 +87,20 @@ public class SkuSaleSeckillServiceImpl extends BaseService implements SkuSaleSec
                 }
                 if(lock){
                     SkuQtyVO skuQtyVO = (SkuQtyVO) getRedisCache().getValue(key);
+                    if(BigDecimal.ZERO.compareTo(skuQtyVO.getSkuQty()) >= 0) {
+                        getRedisCache().delete(lockKey);
+                        logger.warn(skuCode + "此商品已卖完，请看看别的商品");
+                        return 3;
+                    }
                     BigDecimal skuQty = skuQtyVO.getSkuQty().subtract(BigDecimal.ONE);
                     skuQtyVO.setSkuQty(skuQty);
                     getRedisCache().putValue(key,  skuQtyVO);
-                    getRedisCache().delete(Constants.LOCK_SECKILL);
+                    getRedisCache().delete(lockKey);
                     break;
                 }
             }
         } catch (Exception e) {
-            getRedisCache().delete(Constants.LOCK_SECKILL);
+            getRedisCache().delete(lockKey);
             e.printStackTrace();
         }
 

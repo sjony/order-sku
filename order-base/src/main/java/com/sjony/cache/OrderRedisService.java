@@ -221,6 +221,27 @@ public class OrderRedisService<K, V> implements ICache<K, V>{
     }
 
     /**
+     * @Description: 是否有key缓存
+     * @Create on: 2017/8/4 下午5:14 
+     *
+     * @author shujiangcheng
+     */
+    @Override
+    public boolean hasKey(K key) {
+        boolean old = false;
+        try {
+            old = redisClient.hasKey(key);
+            if (logger.isDebugEnabled()) {
+                logger.debug("put cache: key is " + key + ", value is " + old);
+            }
+        } catch (Exception e2) {
+            e2.printStackTrace();
+            logger.error("redis返回锁久信息失败");
+        }
+        return old;
+    }
+
+    /**
      * @Description:新增score值
      * @Create on: 2017/7/21 下午2:54
      * @author jshu

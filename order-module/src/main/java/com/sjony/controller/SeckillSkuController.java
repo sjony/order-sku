@@ -85,7 +85,7 @@ public class SeckillSkuController extends BaseController {
         /*-----------------------------------------------------------------*
                                 逻辑处理
         *----------------------------------------------------------------*/
-        int result = seckillSkuService.updateSeckillSkuQty(skuList);
+        int result = seckillSkuService.updateSeckillSkuQtyTestWithoutRedis(skuList);
 
         /*-----------------------------------------------------------------*
                                 数据返回

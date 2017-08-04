@@ -47,5 +47,7 @@ public interface ICache<K, V> {
 
     Object getSet(String lockKey, String lockValue);
 
+    boolean hasKey(K key);
+
 
 }

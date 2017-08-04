@@ -357,5 +357,16 @@ public class RedisClient<K, V> implements CacheClient<K,V> {
         return result;
     }
 
+    /**
+     * @Description: 是否有key这个缓存
+     * @Create on: 2017/8/4 下午5:12 
+     *
+     * @author shujiangcheng
+     */
+    @Override
+    public boolean hasKey(K key) {
+        return redisTemplate.hasKey(key);
+    }
+
 
 }

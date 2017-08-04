@@ -36,5 +36,6 @@ public interface CacheClient<K,V> {
     Set<V> reverseRange(K key, Long start, Long end);
     boolean setNX(String lockName, String value);
     Object getSet(String key, String value);
+    boolean hasKey(K key);
 
 }

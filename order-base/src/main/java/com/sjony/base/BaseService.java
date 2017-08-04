@@ -39,6 +39,10 @@ public class BaseService<K, V> {
         return type + "," + key;
     }
 
+    protected String getLockKey(String key, Class type) {
+        return "lock_" + type + "," + key;
+    }
+
     private String reKey(String Key) {
         return Key.split(",")[1];
     }

@@ -1,6 +1,8 @@
 package com.sjony.service.impl;
 
 import com.mysql.jdbc.TimeUtil;
+import com.sjony.base.BaseService;
+import com.sjony.cache.OrderRedisService;
 import com.sjony.service.SeckillSkuService;
 import com.sjony.service.SkuQtyService;
 import com.sjony.service.SkuSaleQtyService;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -28,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * @author shujiangcheng
  */
 @Service
-public class SeckillSkuServiceImpl implements SeckillSkuService {
+public class SeckillSkuServiceImpl extends BaseService implements SeckillSkuService {
 
     private static final Logger logger = LoggerFactory.getLogger(SeckillSkuServiceImpl.class);
 
@@ -37,6 +40,7 @@ public class SeckillSkuServiceImpl implements SeckillSkuService {
 
     @Autowired
     private SkuQtyService skuQtyService;
+
 
     /**
      * @Description: 秒杀信息放入缓存 
@@ -82,6 +86,12 @@ public class SeckillSkuServiceImpl implements SeckillSkuService {
         return result;
     }
 
+    /**
+     * @Description: 模拟100个人同时购买
+     * @Create on: 2017/8/4 下午2:19 
+     *
+     * @author shujiangcheng
+     */
     @Override
     public int updateSeckillSkuQtyTest(List<String> skuList) {
         int result = 0;
@@ -91,14 +101,86 @@ public class SeckillSkuServiceImpl implements SeckillSkuService {
         }
         ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(10, 10 , 0l, TimeUnit.MICROSECONDS, new LinkedBlockingDeque<>(),new ThreadPoolExecutor.CallerRunsPolicy());
         for(int i=0; i<100; i++) {
-            logger.warn("第" + i + "个人开始买东西");
+            logger.warn("第" + i + "个人开始买东西啦");
             poolExecutor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    updateSeckillSkuQty(skuList);
+                    int response = updateSeckillSkuQty(skuList);
+                    if(response == 3) {
+                        logger.warn("东西卖完啦");
+                    } else if(response == 2) {
+                        logger.warn("超时啦，请重试");
+                    }
                 }
             });
+            logger.warn("第" + i + "个人买完东西了");
         }
+        poolExecutor.shutdown();
+        return result;
+    }
+
+    /**
+     * @Description: 没有分布式锁的100人购物
+     * @Create on: 2017/8/4 下午2:20 
+     *
+     * @author shujiangcheng
+     */
+    @Override
+    public  int updateSeckillSkuQtyTestWithoutsyn(List<String> skuList) {
+        String skuCode = skuList.get(0);
+        int result = 0;
+        //入参校验
+        if(CollectionUtils.isEmpty(skuList)) {
+            return result;
+        }
+        ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(10, 10 , 0l, TimeUnit.MICROSECONDS, new LinkedBlockingDeque<>(),new ThreadPoolExecutor.CallerRunsPolicy());
+        for(int i=0; i<100; i++) {
+            logger.warn("第" + i + "个人开始买东西啦");
+            poolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    SkuQtyVO skuQtyVO = skuQtyService.getSkuQtyBySkuCode(skuCode, true);
+                    skuQtyVO.setSkuQty(skuQtyVO.getSkuQty().subtract(BigDecimal.ONE));
+                    getRedisCache().putValue(getKey(skuCode, SkuQtyVO.class), skuQtyVO);
+                }
+            });
+            logger.warn("第" + i + "个人买完东西了");
+        }
+        poolExecutor.shutdown();
+        return result;
+    }
+
+    /**
+     * @Description: 不带缓存的购物
+     * @Create on: 2017/8/4 下午2:20 
+     *
+     * @author shujiangcheng
+     */
+    @Override
+    public int updateSeckillSkuQtyTestWithoutRedis(List<String> skuList) {
+        String skuCode = skuList.get(0);
+        int result = 0;
+        //入参校验
+        if(CollectionUtils.isEmpty(skuList)) {
+            return result;
+        }
+        ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(10, 10 , 0l, TimeUnit.MICROSECONDS, new LinkedBlockingDeque<>(),new ThreadPoolExecutor.CallerRunsPolicy());
+        for(int i=0; i<100; i++) {
+            logger.warn("第" + i + "个人开始买东西啦");
+            poolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                   int response = skuQtyService.updateQtyForSale(skuCode);
+                    if(response == 3) {
+                        logger.warn("东西卖完啦");
+                    } else if(response == 2) {
+                        logger.warn("超时啦，请重试");
+                    }
+                }
+            });
+            logger.warn("第" + i + "个人买完东西了");
+        }
+        poolExecutor.shutdown();
         return result;
     }
 

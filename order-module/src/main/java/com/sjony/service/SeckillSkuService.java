@@ -29,4 +29,9 @@ public interface SeckillSkuService {
     int updateSeckillSkuQty(List<String> skuList);
 
     int updateSeckillSkuQtyTest(List<String> skuList);
+
+    int updateSeckillSkuQtyTestWithoutsyn(List<String> skuList);
+
+    int updateSeckillSkuQtyTestWithoutRedis(List<String> skuList);
+
 }
