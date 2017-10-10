@@ -13,6 +13,8 @@
     <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
         <property name="maxIdle" value="${redis.maxIdle}" />
         <property name="maxWaitMillis" value="${redis.maxWait}" />
+        <property name="maxTotal" value="${redis.maxTotal}"/>
+        <property name="minIdle" value="${redis.minIdea}"/>
         <property name="testOnBorrow" value="${redis.testOnBorrow}" />
     </bean>
     <!-- redis服务器中心 -->

@@ -46,13 +46,13 @@ public class SkuSaleSeckillServiceImpl extends BaseService implements SkuSaleSec
         }
         String key = getKey(skuCode, SkuQtyVO.class);
         String lockKey = getLockKey(skuCode, SkuQtyVO.class);
+        long nowThreadTime = System.currentTimeMillis();
         try {
-
             while(true) {
                 long wantlockTime = System.currentTimeMillis();
                 boolean lock = getRedisCache().setNX(lockKey, String.valueOf(wantlockTime));
                 if(!lock) {
-                    long nowThreadTime = System.currentTimeMillis();
+
                     Object lockTiemLatestObject = getRedisCache().getValue(lockKey);
                     long lockTiemLatest = 0;
                     if(null == lockTiemLatestObject) {
@@ -60,18 +60,18 @@ public class SkuSaleSeckillServiceImpl extends BaseService implements SkuSaleSec
                     } else {
                         lockTiemLatest = Long.valueOf((String)lockTiemLatestObject);
                     }
-                    if((nowThreadTime-lockTiemLatest) > 10000) {
+                    if((wantlockTime-nowThreadTime) > 10000) {
                         logger.warn("超时了，请重试");
                         return 2;
                     }
-                    if((nowThreadTime-lockTiemLatest) > EXPIRE_TIME) {
+                    if((wantlockTime-lockTiemLatest) > EXPIRE_TIME) {
                         lockTiemLatestObject = getRedisCache().getValue(lockKey);
                         if(null == lockTiemLatestObject) {
                             continue;
                         } else {
                             lockTiemLatest = Long.valueOf((String)lockTiemLatestObject);
                         }
-                        Object lockTimeObject = getRedisCache().getSet(lockKey, String.valueOf(nowThreadTime));
+                        Object lockTimeObject = getRedisCache().getSet(lockKey, String.valueOf(wantlockTime));
                         long  lockTime = 0;
                         if(null == lockTiemLatestObject) {
                             continue;

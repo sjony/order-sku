@@ -82,6 +82,40 @@ public class SeckillSkuController extends BaseController {
         if(CollectionUtils.isEmpty(skuList)) {
             error("skuCode is null");
         }
+
+        /*-----------------------------------------------------------------*
+                                逻辑处理
+        *----------------------------------------------------------------*/
+        int result = seckillSkuService.updateSeckillSkuQty(skuList);
+
+        /*-----------------------------------------------------------------*
+                                数据返回
+        *----------------------------------------------------------------*/
+        return success(result);
+
+    }
+
+
+    /**
+     * @Description: 秒杀商品扣库存
+     * @Create on: 2017/7/24 下午1:39
+     *
+     * @author shujiangcheng
+     */
+    @ResponseBody
+    @RequestMapping(value = "/updateSeckillSkuQtyWithoutRedis", produces = "application/json;charset=UTF-8", method = RequestMethod.POST)
+    public String updateSeckillSkuQtyWithoutRedis(@RequestParam(value = "data") String data) {
+
+        /*-----------------------------------------------------------------*
+                                入参处理
+        *----------------------------------------------------------------*/
+        if(data == null) {
+            error("data is null");
+        }
+        List<String> skuList = JSON.parseArray(JSON.parseObject(data).getString("skuCode"), String.class);
+        if(CollectionUtils.isEmpty(skuList)) {
+            error("skuCode is null");
+        }
         /*-----------------------------------------------------------------*
                                 逻辑处理
         *----------------------------------------------------------------*/

@@ -164,23 +164,12 @@ public class SeckillSkuServiceImpl extends BaseService implements SeckillSkuServ
         if(CollectionUtils.isEmpty(skuList)) {
             return result;
         }
-        ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(10, 10 , 0l, TimeUnit.MICROSECONDS, new LinkedBlockingDeque<>(),new ThreadPoolExecutor.CallerRunsPolicy());
-        for(int i=0; i<100; i++) {
-            logger.warn("第" + i + "个人开始买东西啦");
-            poolExecutor.execute(new Runnable() {
-                @Override
-                public void run() {
-                   int response = skuQtyService.updateQtyForSale(skuCode);
-                    if(response == 3) {
-                        logger.warn("东西卖完啦");
-                    } else if(response == 2) {
-                        logger.warn("超时啦，请重试");
-                    }
-                }
-            });
-            logger.warn("第" + i + "个人买完东西了");
+        int response = skuQtyService.updateQtyForSale(skuCode);
+        if(response == 3) {
+            logger.warn("东西卖完啦");
+        } else if(response == 2) {
+            logger.warn("超时啦，请重试");
         }
-        poolExecutor.shutdown();
         return result;
     }
 
