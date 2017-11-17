@@ -4,7 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.sjony.base.BaseController;
 import com.sjony.service.SeckillSkuService;
+import com.sjony.service.impl.SkuSaleSeckillServiceImpl;
 import com.sjony.utils.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,8 +29,13 @@ import java.util.List;
 @RequestMapping("/rest/seckillSku")
 public class SeckillSkuController extends BaseController {
 
+    private static final Logger logger = LoggerFactory.getLogger(SeckillSkuController.class);
+
+    private static int i = 0;
+
     @Autowired
     private SeckillSkuService seckillSkuService;
+
 
 
     /**
@@ -75,6 +83,8 @@ public class SeckillSkuController extends BaseController {
         /*-----------------------------------------------------------------*
                                 入参处理
         *----------------------------------------------------------------*/
+        logger.warn("扣库存" + ++i);
+
         if(data == null) {
             error("data is null");
         }

@@ -32,6 +32,8 @@ public class SkuSaleSeckillServiceImpl extends BaseService implements SkuSaleSec
 
     private static final Logger logger = LoggerFactory.getLogger(SkuSaleSeckillServiceImpl.class);
 
+    private static int i = 0;
+
 
     /**
      * @Description: 更新库存 秒杀
@@ -98,6 +100,7 @@ public class SkuSaleSeckillServiceImpl extends BaseService implements SkuSaleSec
                     getRedisCache().delete(lockKey);
                     break;
                 }
+                Thread.sleep(500);
             }
         } catch (Exception e) {
             getRedisCache().delete(lockKey);

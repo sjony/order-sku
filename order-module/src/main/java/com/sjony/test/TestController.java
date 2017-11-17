@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -68,5 +69,28 @@ public class TestController extends BaseController {
 
     }
 
+
+    //工具测试
+    public static void main(String[] args) throws IOException {
+        String sm = FileUtils.readFileToString(new File("/Users/sjony/Downloads/test1.txt"));
+        String big = FileUtils.readFileToString(new File("/Users/sjony/Downloads/test2.txt"));
+        List<String> bigList = Arrays.asList(big.split(","));
+        List<String> smList = Arrays.asList(sm.split(","));
+        Inclusive(bigList, smList);
+    }
+
+    /**
+     * @Description: 找到包含外的数据
+     * @Create on: 2017/11/17 上午10:44 
+     *
+     * @author shujiangcheng
+     */
+    private static void Inclusive(List<String> bigList, List<String> smList) {
+        for(String bigString : bigList) {
+            if(!smList.contains(bigString)) {
+                System.out.println(bigString);
+            }
+        }
+    }
 
 }

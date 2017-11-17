@@ -1,4 +1,4 @@
-package com.sjony.head_first.factory;
+package com.sjony.study.head_first.factory;
 
 /**
  * Created by sjony on 2017/9/21.

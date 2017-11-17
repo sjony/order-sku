@@ -58,7 +58,6 @@ public class SalesTask {
 
         Integer count = skuSaleQtyDao.selectCountForRank();
         int page = count/Constants.SALE_PAGE_SIZE;
-
         ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(5, 5,  0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(),new ThreadPoolExecutor.CallerRunsPolicy());
 

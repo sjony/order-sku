@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Service
 public class MQProducerImpl implements MQProducer {
 	@Autowired
 	private AmqpTemplate amqpTemplate;
@@ -35,7 +34,7 @@ public class MQProducerImpl implements MQProducer {
 			UUID uuid = UUID.randomUUID();
 			CorrelationData a = new CorrelationData(String.valueOf(uuid));
 
-			rabbitTemplate.convertAndSend("topic_sjony", "test.11111", object, a);
+			rabbitTemplate.convertAndSend(null);
 		} catch (Exception e) {
 			LOGGER.error("", e);
 		}

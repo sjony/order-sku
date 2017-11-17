@@ -1,4 +1,4 @@
-package com.sjony.Thread;
+package com.sjony.study.Thread;
 
 import com.google.common.collect.Lists;
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
