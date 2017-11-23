@@ -15,7 +15,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -72,11 +76,20 @@ public class TestController extends BaseController {
 
     //工具测试
     public static void main(String[] args) throws IOException {
-        String sm = FileUtils.readFileToString(new File("/Users/sjony/Downloads/test1.txt"));
+        /*String sm = FileUtils.readFileToString(new File("/Users/sjony/Downloads/test1.txt"));
         String big = FileUtils.readFileToString(new File("/Users/sjony/Downloads/test2.txt"));
         List<String> bigList = Arrays.asList(big.split(","));
         List<String> smList = Arrays.asList(sm.split(","));
-        Inclusive(bigList, smList);
+        Inclusive(bigList, smList);*/
+        /*SimpleDateFormat sdfShelfLife = new SimpleDateFormat("yyyy-MM-dd");
+
+        Calendar curr = Calendar.getInstance();
+        curr.set(Calendar.YEAR,curr.get(Calendar.YEAR)+2);
+        Date date=curr.getTime();
+        System.out.print(sdfShelfLife.format(date));*/
+
+        int a = BigDecimal.ZERO.compareTo(null);
+        System.out.print(a);
     }
 
     /**
