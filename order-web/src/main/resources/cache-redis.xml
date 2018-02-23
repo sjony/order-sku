@@ -38,6 +38,15 @@
         </property>
     </bean>
 
+    <!-- redis的连接池pool 使用redis-->
+    <bean id = "jedisPool" class="redis.clients.jedis.JedisPool" destroy-method="destroy">
+        <constructor-arg index="0" ref="poolConfig" />
+        <constructor-arg index="1" value="${redis.host}"/>
+        <constructor-arg index="2" value="${redis.port}" type="int"/>
+        <constructor-arg index="3" value="${redis.timeout}" type="int"/>
+        <!--         <constructor-arg index="4" value="${redis.pass}"/> -->
+    </bean>
+
     <!-- cache配置 -->
     <bean id="orderRedisService" class="com.sjony.cache.OrderRedisService">
         <constructor-arg index="0" ref="redistClient" />

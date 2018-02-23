@@ -35,6 +35,7 @@ public class SkuSaleSeckillServiceImpl extends BaseService implements SkuSaleSec
     private static int i = 0;
 
 
+
     /**
      * @Description: 更新库存 秒杀
      * @Create on: 2017/7/15 下午2:00

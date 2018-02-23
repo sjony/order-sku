@@ -4,10 +4,12 @@ import com.google.common.collect.Lists;
 import com.sjony.cache.ICache;
 import com.sjony.cache.OrderRedisService;
 import com.sjony.utils.CollectionUtils;
+import com.sjony.utils.JedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
+import redis.clients.jedis.Jedis;
 
 import java.util.List;
 
@@ -45,6 +47,10 @@ public class BaseService<K, V> {
 
     private String reKey(String Key) {
         return Key.split(",")[1];
+    }
+
+    protected Jedis getJedis() {
+        return JedisUtil.getJedis();
     }
 
 }

@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("rest/test")
@@ -88,8 +89,12 @@ public class TestController extends BaseController {
         Date date=curr.getTime();
         System.out.print(sdfShelfLife.format(date));*/
 
-        int a = BigDecimal.ZERO.compareTo(null);
-        System.out.print(a);
+        String s = "12345689t876543";
+        String pattern = "[\\d]{15}";
+
+        boolean isNum = Pattern.matches(pattern, s);
+        System.out.println(isNum);
+
     }
 
     /**
