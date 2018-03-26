@@ -127,18 +127,19 @@ public abstract class Taxi  implements TaxiRun {
             System.exit(0);
         }
 
+        Double currentInitiateRate = null;    //当前起步价
         Double currentAfterStartPerKmPrice = null;    //当前3-10的价钱
         Double currentAfterTenPerKmPrice = null;   //当前10公里以后的价钱
 
         //首先根据上车时间，判断当前算白天还是夜晚，然后对价钱取值
         // 夜间
         if(startTime.compareTo(startNightTime) >= 0 || startTime.compareTo(endNightTime) < 0) {
-
+            currentInitiateRate = initiateRate;
             currentAfterStartPerKmPrice = afterStartPerKmPriceNight;
             currentAfterTenPerKmPrice = afterTenPerKmPriceNight;
 
         } else {    //白天
-
+            currentInitiateRate = initiateRateNight;
             currentAfterStartPerKmPrice = afterStartPerKmPrice;
             currentAfterTenPerKmPrice = afterTenPerKmPrice;
 
@@ -153,17 +154,17 @@ public abstract class Taxi  implements TaxiRun {
         //如果小于3公里
         if(currentKm <= startingRoad) {
 
-            total = initiateRate;
+            total = currentInitiateRate;
 
         } else {
             //如果大于3公里并且小于10公里
             if(currentKm <= 10) {
 
-                total = initiateRate + (currentKm-3) * currentAfterStartPerKmPrice;
+                total = currentInitiateRate + (currentKm-3) * currentAfterStartPerKmPrice;
 
             } else {        //如果大于10公里
 
-                total = initiateRate + 7 * currentAfterStartPerKmPrice + (currentKm-10) * currentAfterTenPerKmPrice;
+                total = currentInitiateRate + 7 * currentAfterStartPerKmPrice + (currentKm-10) * currentAfterTenPerKmPrice;
 
             }
 
